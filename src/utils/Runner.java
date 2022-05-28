@@ -4,15 +4,10 @@ import templates.Blockchain;
 
 import java.util.Scanner;
 
+
 public class Runner {
     public static void run() {
-        System.out.println("Enter how many zeros the hash must start with: ");
-        int number;
-        try (Scanner scanner = new Scanner(System.in)) {
-            number = scanner.nextInt();
-        }
-
-        Blockchain blockchain = new Blockchain(number);
+        Blockchain blockchain = new Blockchain();
 
         for (int i = 0; i < 5; i++) {
             blockchain.addBlock();
@@ -22,4 +17,5 @@ public class Runner {
             System.out.println(blockchain.getBlock(i) + "\n");
         }
     }
+
 }
