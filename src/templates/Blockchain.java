@@ -1,87 +1,82 @@
 package templates;
 
+import utils.SerializationUtil;
+import utils.StringHashUtil;
+
+import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Blockchain {
+public class Blockchain implements Serializable {
     private static final long serialVersionUID = 1L;
     private final List<Block> blockchain;
-    private int blockCount;
-    private int hashZerosDelta = 0;
-    private double timeSpent;
+    private int blockCount = 0;
+    private int zeroCount = 0;
+    private String filename;
 
-    public Blockchain() {
+    public Blockchain(String filename) {
         blockchain = new ArrayList<>();
-        this.blockCount = 0;
-        this.timeSpent = 0;
-
-    }
-
-    private int countZeros() {
-        if (blockCount == 0) {
-            return 0;
-        } else if (timeSpent < 10L) {
-            return hashZerosDelta++;
-        } else if (timeSpent > 20L) {
-            return hashZerosDelta++;
-        } else {
-            return hashZerosDelta;
-        }
-    }
-
-    public void addBlock() {
-        StringBuilder match = new StringBuilder("0");
-        match.append("0".repeat(Math.max(0, countZeros())));
-
-        long startTime = System.nanoTime();
-        long i = 0;
-
-        if (hashZerosDelta == 0) {
-            Block temp = new Block(this, 0);
-            this.blockchain.add(temp);
-            blockCount++;
-            return;
-        }
-
-        while (true) {
-            Block temp = new Block(this, i++);
-            if (temp.getHash().substring(0, hashZerosDelta).equals(match.toString())) {
-
-                long endTime = System.nanoTime();
-                double genTime = (endTime - startTime) * 1e-9;
-                temp.setGenTime(genTime);
-
-                if (hashZerosDelta > 0) {
-                    temp.toString().concat(String.format("N was increased to %d\n\n", hashZerosDelta));
-                } else if (hashZerosDelta < 0) {
-                    temp.toString().concat(String.format("N was decreased to %d\n\n", 1));
-                } else {
-                    temp.toString().concat(String.format("N stays the same\n\n"));
-                }
-
-                this.blockchain.add(temp);
-                this.timeSpent = genTime;
-                blockCount++;
-
-
-                break;
-            }
-        }
+        this.filename = filename;
     }
 
     public Block getBlock(int id) {
         return blockchain.get(id - 1);
     }
 
+    public void addBlock(Block b) throws IOException {
+        if (validateAdd(b)) {
+            this.blockchain.add(b);
+            blockCount++;
+
+            SerializationUtil.serialize(this, filename);
+        }
+    }
+
+    public void setZeroCount(int zeroCount) {
+        this.zeroCount = zeroCount;
+    }
+
+    public int getZeroCount() {
+        return zeroCount;
+    }
+
+    private String getHash(String toHash) {
+        return StringHashUtil.applySha256(toHash);
+    }
+
     public int getBlockCount() {
         return blockCount;
     }
 
-    public int getHashZerosDelta() {
-        return hashZerosDelta;
+    public boolean validate() {
+        for (int i = 1; i < blockchain.size(); i++) {
+            String prevBlockHash = blockchain.get(i - 1).getHash();
+            String currBlockHash = blockchain.get(i).getHash();
+
+            String currBlockToVerify = blockchain.get(i).toValidate() + prevBlockHash + "\n";
+
+            if (!currBlockHash.equals(getHash(currBlockToVerify))) {
+                return false;
+            }
+        }
+        return true;
     }
 
-    public void setHashZerosDelta(int hashZerosDelta) {
-        this.hashZerosDelta = hashZerosDelta;
+    private boolean validateAdd(Block b) {
+        if (blockCount == 0 || blockCount == 1) {
+            return true;
+        }
+
+        String newBlockHash = b.getHash();
+        String lastBlockHash = getBlock(blockCount).getHash();
+
+        String blockToVerify = b.toValidate() + lastBlockHash + "\n";
+
+        if (newBlockHash.equals(getHash(blockToVerify))) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }
