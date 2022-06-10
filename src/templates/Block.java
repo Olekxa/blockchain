@@ -1,71 +1,130 @@
 package templates;
 
-import utils.StringHashUtil;
-
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 
-
 public class Block implements Serializable {
-    private static final long serialVersionUID = 1L;
-    private final Blockchain parent;
-    private final int id;
-    private final long timeStamp = new Date().getTime();;
-    private final String prevBlockHash;
-    private final String hash;
-    private final long magicNumber;
-    private final long minerNumber;
-    private double genTime;
 
-    public Block(Blockchain parent, long magicNumber, long minerNumber) {
-        this.parent = parent;
-        this.id = parent.getBlockCount() + 1;
-        this.magicNumber = magicNumber;
-        this.minerNumber = minerNumber;
+    private final long id;
+    private final long timestamp;
+    private final String hashOfPrevious;
 
-        if(this.id == 1) {
-            this.prevBlockHash = "0";
+    private int minerId;
+    private PaymentForTransaction minerPaymentForTransaction;
+    private final ArrayList<Transaction> data;
+    private String hash;
+    private long magicNum;
+    private long timeToGenerate;
+    private String zeroUpdateMessage;
+
+    public Block(Block previous) {
+        this.id = IdCounter.generateBlockId();
+        this.timestamp = new Date().getTime();
+        this.hashOfPrevious = previous == null ? "0" : previous.getHash();
+        this.minerId = 0;
+        this.minerPaymentForTransaction = null;
+        this.data = new ArrayList<>();
+        this.hash = null;
+        this.magicNum = 0L;
+        this.timeToGenerate = 0L;
+        this.zeroUpdateMessage = "";
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder ret = new StringBuilder();
+        ret.append(String.format("""
+                        Block:
+                        Created by miner # %s
+                        %s
+                        Id: %s
+                        Timestamp: %s
+                        Magic number: %s
+                        Hash of the previous block:
+                        %s%nHash of the block:
+                        %s%n""",
+                this.getMinerId(), this.getMinerPaymentTransaction().buildMessage(), this.getId(), this.getTimestamp(), this.getMagicNum(), this.getHashOfPrevious(), this.getHash()) );
+        ret.append( "Block data: " );
+        if (this.data.isEmpty()) {
+            ret.append( "\nNo transactions" );
         } else {
-            this.prevBlockHash = parent.getBlock(id - 1).getHash();
+            for (Transaction data : this.getData()) {
+                ret.append("\n");
+                ret.append(data.buildMessage());
+            }
         }
-
-        this.hash = StringHashUtil.applySha256(this.toHash());
+        ret.append("\n");
+        ret.append( String.format("Block was generating for %s seconds\n" + "%s%n", this.getTimeToGenerate(), this.getZeroUpdateMessage()) );
+        return ret.toString();
     }
 
-    public void setGenTime(double time) {
-        genTime = time;
+    public synchronized void addTransaction(Transaction transaction) {
+        this.data.add(transaction);
     }
 
-    public double getGenTime() {
-        return genTime;
+    public String getZeroUpdateMessage() {
+        return zeroUpdateMessage;
     }
 
-    public String toHash() {
-        return "Block:\n" +
-                "Created by miner # " + minerNumber + "\n" +
-                "Id: " + id + "\n" +
-                "Timestamp: " + timeStamp + "\n" +
-                "Magic number: " + magicNumber + "\n" +
-                "Hash of the previous block:\n" +
-                prevBlockHash + "\n";
+    public int getMinerId() {
+        return minerId;
     }
 
-    String toValidate() {
-        return "Block:\n" +
-                "Created by miner # " + minerNumber + "\n" +
-                "Id: " + id + "\n" +
-                "Timestamp: " + timeStamp + "\n" +
-                "Magic number: " + magicNumber + "\n" +
-                "Hash of the previous block:\n";
+    public void setMinerId(int minerId) {
+        this.minerId = minerId;
+    }
+
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    public long getId() {
+        return id;
     }
 
     public String getHash() {
         return hash;
     }
 
-    @Override
-    public String toString() {
-        return toHash() + "Hash of the block:\n" + hash + "\n" +
-                "Block was generating for " + String.format("%.2f", genTime) + " seconds";
+    public String getHashOfPrevious() {
+        return hashOfPrevious;
+    }
+
+    public long getMagicNum() {
+        return magicNum;
+    }
+
+    public long getTimeToGenerate() {
+        return timeToGenerate;
+    }
+
+    public void setZeroUpdateMessage(String zeroUpdateMessage) {
+        this.zeroUpdateMessage = zeroUpdateMessage;
+    }
+
+    public void setHash(String hash) {
+        this.hash = hash;
+    }
+
+    public ArrayList<Transaction> getData() {
+        return data;
+    }
+
+    public void setMagicNum(long magicNum) {
+        this.magicNum = magicNum;
+    }
+
+    public void setTimeToGenerate(long timeToGenerate) {
+        this.timeToGenerate = timeToGenerate;
+    }
+
+
+    public PaymentForTransaction getMinerPaymentTransaction() {
+        return minerPaymentForTransaction;
+    }
+
+    public void setMinerPaymentTransaction(PaymentForTransaction minerPaymentForTransaction) {
+        this.minerPaymentForTransaction = minerPaymentForTransaction;
     }
 }

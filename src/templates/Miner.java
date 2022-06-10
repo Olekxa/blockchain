@@ -1,39 +1,86 @@
 package templates;
 
+import utils.StringHashUtil;
+
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.util.Date;
 import java.util.Random;
-import java.util.concurrent.Callable;
 
-public class Miner implements Callable<Block> {
-    private final long minerNum;
-    private final Blockchain blockchain;
-    private final int zeroCount;
+public class Miner implements Runnable {
 
-    public Miner(int number, Blockchain bc, int count) {
-        minerNum = number;
-        blockchain = bc;
-        zeroCount = count;
+    private final int id;
+    private final Account account;
+
+    public Miner() throws NoSuchAlgorithmException {
+        this.id = IdCounter.generateThreadId();
+        this.account = new Account("miner" + this.id, true);
+        Blockchain.getInstance().registerAccount(this.account);
     }
 
     @Override
-    public Block call() throws Exception {
-        String match = "0";
-        for (int i = 1; i < zeroCount; i++) {
-            match += "0";
+    public void run() {
+
+        while (Blockchain.getInstance().underConstruction()) {
+            Proof proof = generateProof();
+            Blockchain.getInstance().receiveFromMiner(this, proof.getHash(), proof.getMagicNum(), proof.getTimeToGenerate());
+        }
+    }
+
+    private Proof generateProof() {
+        Proof proof = new Proof();
+        String compatibleHash;
+        Random rand = new Random();
+        long randLong;
+        int initialN = Blockchain.getInstance().getNumOfStartingZeros();
+        do {
+            randLong = Math.abs(rand.nextLong());
+            compatibleHash = StringHashUtil.applySha256(this.id
+                    + Blockchain.getInstance().getBlockUnderConstruction().getHashOfPrevious()
+                    + Blockchain.getInstance().getBlockUnderConstruction().getTimestamp()
+                    + randLong);
+        } while ((!compatibleHash.substring(0, Blockchain.getInstance().getNumOfStartingZeros()).matches("0*")) && (Blockchain.getInstance().getNumOfStartingZeros() == initialN));
+        proof.setHash(compatibleHash);
+        proof.setMagicNum(randLong);
+        proof.setTimeToGenerate(((new Date().getTime()) - Blockchain.getInstance().getBlockUnderConstruction().getTimestamp()) / 1000);
+        return proof;
+    }
+
+    public Account getAccount() {
+        return account;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    class Proof {
+        private String hash;
+        private long magicNum;
+        private long timeToGenerate;
+
+        public String getHash() {
+            return hash;
         }
 
-        long startTime = System.nanoTime();
-        Random random = new Random();
+        public void setHash(String hash) {
+            this.hash = hash;
+        }
 
-        while(true) {
-            Block temp = new Block(blockchain, random.nextLong(), minerNum);
+        public long getMagicNum() {
+            return magicNum;
+        }
 
-            if(temp.getHash().substring(0, zeroCount).equals(match)) {
-                long endTime = System.nanoTime();
-                double genTime = (endTime - startTime) * 1e-9;
-                temp.setGenTime(genTime);
+        public void setMagicNum(long magicNum) {
+            this.magicNum = magicNum;
+        }
 
-                return temp;
-            }
+        public long getTimeToGenerate() {
+            return timeToGenerate;
+        }
+
+        public void setTimeToGenerate(long timeToGenerate) {
+            this.timeToGenerate = timeToGenerate;
         }
     }
 }
