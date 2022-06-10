@@ -19,14 +19,16 @@ public class Blockchain implements Serializable {
     private static final int MAX_NUM_OF_BLOCKS = 15;
     private static final int MAX_NUM_OF_ZEROS = 4;
 
+    private static final long THRESHOLD_SAME = 5L;
+    private static final long THRESHOLD_MINUS = 10L;
+
+    private static final String N_UPDATE_MINUS = "N was decreased by 1";
+    private static final String N_UPDATE_SAME = "N stays the same";
+    private static final String N_UPDATE_PLUS = "N was increased to ";
+
     @Serial
     private static final long serialVersionUID = 7L;
 
-    private final long THRESHOLD_SAME = 5L;
-    private final long THRESHOLD_MINUS = 10L;
-    private final String N_UPDATE_MINUS = "N was decreased by 1";
-    private final String N_UPDATE_SAME = "N stays the same";
-    private final String N_UPDATE_PLUS = "N was increased to ";
 
     private static volatile Blockchain instance;
     private static final List<Account> registeredAccounts = new ArrayList<>();

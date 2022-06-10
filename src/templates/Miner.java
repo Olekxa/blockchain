@@ -3,7 +3,6 @@ package templates;
 import utils.StringHashUtil;
 
 import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.util.Date;
 import java.util.Random;
 
@@ -54,7 +53,7 @@ public class Miner implements Runnable {
         return id;
     }
 
-    class Proof {
+    protected static class  Proof {
         private String hash;
         private long magicNum;
         private long timeToGenerate;

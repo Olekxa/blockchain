@@ -1,13 +1,6 @@
 package templates;
 
-public class PaymentForTransaction {
-    private final Account receiver;
-    private final long value;
-
-    public PaymentForTransaction(Account receiver, long value) {
-        this.receiver = receiver;
-        this.value = value;
-    }
+public record PaymentForTransaction(Account receiver, long value) {
 
     public Account getReceiver() {
         return receiver;

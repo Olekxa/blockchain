@@ -31,5 +31,4 @@ public class TransactionBasis {
                 " VC to " +
                 this.receiver.getName();
     }
-
 }
