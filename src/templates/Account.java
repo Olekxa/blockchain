@@ -35,7 +35,7 @@ public class Account implements Runnable {
     public void run() {
         Random rand = new Random();
         if (isSending) {
-            while (Blockchain.getInstance().underConstruction()) {
+            while (Blockchain.getInstance().underCreation()) {
                 try {
                     Thread.sleep(rand.nextInt(5) * 500);
                 } catch (InterruptedException e) {

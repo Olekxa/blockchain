@@ -20,7 +20,7 @@ public class Miner implements Runnable {
     @Override
     public void run() {
 
-        while (Blockchain.getInstance().underConstruction()) {
+        while (Blockchain.getInstance().underCreation()) {
             Proof proof = generateProof();
             Blockchain.getInstance().receiveFromMiner(this, proof.getHash(), proof.getMagicNum(), proof.getTimeToGenerate());
         }
@@ -35,13 +35,13 @@ public class Miner implements Runnable {
         do {
             randLong = Math.abs(rand.nextLong());
             compatibleHash = StringHashUtil.applySha256(this.id
-                    + Blockchain.getInstance().getBlockUnderConstruction().getHashOfPrevious()
-                    + Blockchain.getInstance().getBlockUnderConstruction().getTimestamp()
+                    + Blockchain.getInstance().getBlockUnderCreation().getHashOfPrevious()
+                    + Blockchain.getInstance().getBlockUnderCreation().getTimestamp()
                     + randLong);
         } while ((!compatibleHash.substring(0, Blockchain.getInstance().getNumOfStartingZeros()).matches("0*")) && (Blockchain.getInstance().getNumOfStartingZeros() == initialN));
         proof.setHash(compatibleHash);
         proof.setMagicNum(randLong);
-        proof.setTimeToGenerate(((new Date().getTime()) - Blockchain.getInstance().getBlockUnderConstruction().getTimestamp()) / 1000);
+        proof.setTimeToGenerate(((new Date().getTime()) - Blockchain.getInstance().getBlockUnderCreation().getTimestamp()) / 1000);
         return proof;
     }
 

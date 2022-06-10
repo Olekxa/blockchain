@@ -5,12 +5,11 @@ import utils.SerializationUtil;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Runner {
-    public static void main(String[] args) throws InterruptedException, NoSuchAlgorithmException, NoSuchProviderException {
+    public static void main(String[] args) throws InterruptedException, NoSuchAlgorithmException {
 
         try {
             Blockchain importedBlockChain = (Blockchain) SerializationUtil.deserialize("blockchain.txt");
@@ -60,9 +59,6 @@ public class Runner {
         miner2.start();
         miner3.start();
         miner4.start();
-
-        while (Blockchain.getInstance().underConstruction()) {
-        }
 
         for (Thread accountThread : listOfAccountThreads) {
             accountThread.join();

@@ -96,11 +96,11 @@ public class Blockchain implements Serializable {
 
     public synchronized void receiveFromMiner(Miner miner, String hash, long magicNum, long timeToGenerate) {
         if (hash.substring(0, numOfStartingZeros).matches("0*")) {
-            concludeBlock(miner, hash, magicNum, timeToGenerate);
+            putTheBlock(miner, hash, magicNum, timeToGenerate);
         }
     }
 
-    private synchronized void concludeBlock(Miner miner, String hash, long magicNum, long timeToGenerate) {
+    private synchronized void putTheBlock(Miner miner, String hash, long magicNum, long timeToGenerate) {
         blockIsCreating.setMinerId(miner.getId());
         blockIsCreating.setHash(hash);
         blockIsCreating.setMagicNum(magicNum);
@@ -136,11 +136,11 @@ public class Blockchain implements Serializable {
         return numOfStartingZeros;
     }
 
-    public boolean underConstruction() {
+    public boolean underCreation() {
         return blocksList.size() < MAX_NUM_OF_BLOCKS;
     }
 
-    public Block getBlockUnderConstruction() {
+    public Block getBlockUnderCreation() {
         return blockIsCreating;
     }
 
