@@ -48,7 +48,7 @@ public class Blockchain implements Serializable {
         return instance;
     }
 
-    public synchronized long getFundsByAccountUUID(UUID uuid) {
+    public synchronized long getBalanceByAccountUUID(UUID uuid) {
         long ret = 0;
         for (Block block : blocksList) {
             if (block.getMinerPaymentTransaction().getReceiver().getUuid() == uuid) {

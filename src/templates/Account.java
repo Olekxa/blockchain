@@ -28,7 +28,7 @@ public class Account implements Runnable {
     }
 
     public long getCapital() {
-        return Blockchain.getInstance().getFundsByAccountUUID(this.uuid);
+        return Blockchain.getInstance().getBalanceByAccountUUID(this.uuid);
     }
 
     @Override

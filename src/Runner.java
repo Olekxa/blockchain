@@ -42,11 +42,13 @@ public class Runner {
             Blockchain.getInstance().registerAccount(account);
         }
 
-        List<Account> listOfAccounts = Blockchain.getInstance().getRegisteredAccounts();
+        //List<Account> listOfAccounts = Blockchain.getInstance().getRegisteredAccounts();
         Thread miner1 = new Thread(new Miner());
         Thread miner2 = new Thread(new Miner());
         Thread miner3 = new Thread(new Miner());
         Thread miner4 = new Thread(new Miner());
+
+        List<Account> listOfAccounts = Blockchain.getInstance().getRegisteredAccounts();
 
         List<Thread> listOfAccountThreads = new ArrayList<>();
         for (Account account : listOfAccounts) {
@@ -63,6 +65,11 @@ public class Runner {
         for (Thread accountThread : listOfAccountThreads) {
             accountThread.join();
         }
+
+        miner1.join();
+        miner2.join();
+        miner3.join();
+        miner4.join();
     }
 }
 
