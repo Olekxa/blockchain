@@ -8,6 +8,7 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.Signature;
 import java.security.SignatureException;
+import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 
@@ -37,14 +38,14 @@ public class Account implements Runnable {
         if (isSending) {
             while (Blockchain.getInstance().underCreation()) {
                 try {
-                    Thread.sleep(rand.nextInt(5) * 500);
+                    Thread.sleep(rand.nextInt(5) * 100);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                TransactionBasis transactionBasis = TransactionOperation.generateRandomTransactionBasis(this);
-                if (transactionBasis != null) {
+                Optional<TransactionBasis> transactionBasis = TransactionOperation.generateRandomTransactionBasis(this);
+                if (transactionBasis.isPresent())
                     try {
-                        Transaction transaction = createSignedTransaction(transactionBasis);
+                        Transaction transaction = createSignedTransaction(transactionBasis.get());
                         Blockchain.getInstance().receiveFromAccount(this, transaction);
                     } catch (NoSuchAlgorithmException | SignatureException | InvalidKeyException e) {
                         e.printStackTrace();
@@ -52,16 +53,16 @@ public class Account implements Runnable {
                 }
             }
         }
-    }
 
-    private synchronized Transaction createSignedTransaction(TransactionBasis transactionBasis) throws NoSuchAlgorithmException, SignatureException, InvalidKeyException {
+
+    private Transaction createSignedTransaction(TransactionBasis transactionBasis) throws NoSuchAlgorithmException, SignatureException, InvalidKeyException {
         long transactionId = IdCounter.generateTransactionCounter();
         String transactionMsg = transactionBasis.buildMessage();
         byte[] signatureInput = (transactionId + transactionMsg + getLedgerSignature()).getBytes();
         return new Transaction(transactionBasis, transactionId, generateSignatureThroughPrivateKey(signatureInput), this.publicKey);
     }
 
-    private synchronized byte[] generateSignatureThroughPrivateKey(byte[] signatureInput) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
+    private byte[] generateSignatureThroughPrivateKey(byte[] signatureInput) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
         Signature rsa = Signature.getInstance("SHA1withRSA");
         rsa.initSign(this.privateKey);
         rsa.update(signatureInput);

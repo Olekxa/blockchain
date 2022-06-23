@@ -51,7 +51,7 @@ public class Block implements Serializable {
         } else {
             for (Transaction data : this.getData()) {
                 ret.append("\n");
-                ret.append(data.buildMessage());
+                ret.append(data.getTransactionBasis().buildMessage());
             }
         }
         ret.append("\n");

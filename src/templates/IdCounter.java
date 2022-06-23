@@ -15,7 +15,7 @@ public class IdCounter {
         return (++threadCounter);
     }
 
-    public static long generateTransactionCounter() {
+    public synchronized static long generateTransactionCounter() {
         return (++transactionCounter);
     }
 }

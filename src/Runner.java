@@ -8,6 +8,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
+
 public class Runner {
     public static void main(String[] args) throws InterruptedException, NoSuchAlgorithmException {
 
@@ -37,7 +38,6 @@ public class Runner {
                 new Account("CarShop", true),
                 new Account("FastFood", false)
         );
-        Blockchain.getInstance();//todo
         for (Account account : accounts) {
             Blockchain.getInstance().registerAccount(account);
         }
@@ -70,6 +70,7 @@ public class Runner {
         miner2.join();
         miner3.join();
         miner4.join();
+
     }
 }
 

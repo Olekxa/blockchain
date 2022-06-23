@@ -55,18 +55,18 @@ public class Blockchain implements Serializable {
                 ret += block.getMinerPaymentTransaction().getValue();
             }
             for (Transaction transaction : block.getData()) {
-                if (transaction.getReceiver().getUuid() == uuid) {
-                    ret += transaction.getValue();
-                } else if (transaction.getSender().getUuid() == uuid) {
-                    ret -= transaction.getValue();
+                if (transaction.getTransactionBasis().getReceiver().getUuid() == uuid) {
+                    ret += transaction.getTransactionBasis().getValue();
+                } else if (transaction.getTransactionBasis().getSender().getUuid() == uuid) {
+                    ret -= transaction.getTransactionBasis().getValue();
                 }
             }
         }
         for (Transaction transaction : blockIsCreating.getData()) {
-            if (transaction.getReceiver().getUuid() == uuid) {
-                ret += transaction.getValue();
-            } else if (transaction.getSender().getUuid() == uuid) {
-                ret -= transaction.getValue();
+            if (transaction.getTransactionBasis().getReceiver().getUuid() == uuid) {
+                ret += transaction.getTransactionBasis().getValue();
+            } else if (transaction.getTransactionBasis().getSender().getUuid() == uuid) {
+                ret -= transaction.getTransactionBasis().getValue();
             }
         }
         return ret;
@@ -83,14 +83,14 @@ public class Blockchain implements Serializable {
     private synchronized boolean validateTransaction(Account senderAccount, Transaction transaction) throws SignatureException, InvalidKeyException, NoSuchAlgorithmException {
         Signature sig = Signature.getInstance("SHA1withRSA");
         sig.initVerify(transaction.getPublicKey());
-        byte[] signatureInput = (transaction.getTransactionId() + transaction.buildMessage() + senderAccount.getLedgerSignature()).getBytes();
+        byte[] signatureInput = (transaction.getTransactionId() + transaction.getTransactionBasis().buildMessage() + senderAccount.getLedgerSignature()).getBytes();
         sig.update(signatureInput);
         List<Transaction> previousListOfTransactions = blocksList.getLast().getData();
         long maxTransactionId;
         maxTransactionId = (previousListOfTransactions.isEmpty()) ? 0 : Collections.max(previousListOfTransactions.stream().map(Transaction::getTransactionId).toList());
         return (sig.verify(transaction.getSignature())
                 && transaction.getTransactionId() > maxTransactionId
-                && senderAccount.getCapital() >= transaction.getValue()
+                && senderAccount.getCapital() >= transaction.getTransactionBasis().getValue()
         );
     }
 
@@ -100,7 +100,7 @@ public class Blockchain implements Serializable {
         }
     }
 
-    private synchronized void putTheBlock(Miner miner, String hash, long magicNum, long timeToGenerate) {
+    private void putTheBlock(Miner miner, String hash, long magicNum, long timeToGenerate) {
         blockIsCreating.setMinerId(miner.getId());
         blockIsCreating.setHash(hash);
         blockIsCreating.setMagicNum(magicNum);
