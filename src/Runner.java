@@ -3,6 +3,7 @@ import templates.Blockchain;
 import templates.Miner;
 import utils.SerializationUtil;
 
+import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -11,15 +12,18 @@ import java.util.List;
 
 public class Runner {
     public static void main(String[] args) throws InterruptedException, NoSuchAlgorithmException {
-       // if ()
-        try {
-            Blockchain importedBlockChain = (Blockchain) SerializationUtil.deserialize("blockchain.txt");
-            Blockchain.getInstance().setBlocksList(importedBlockChain.getBlocksList());
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return;
+        String path = "blockchain.txt";
+        File file = new File(path);
+        if (file.exists()) {
+            try {
+                Blockchain importedBlockChain = (Blockchain) SerializationUtil.deserialize(path);
+                Blockchain.getInstance().setBlocksList(importedBlockChain.getBlocksList());
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
+                return;
+            }
         }
 
 
