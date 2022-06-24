@@ -29,7 +29,7 @@ public class Blockchain implements Serializable {
     @Serial
     private static final long serialVersionUID = 7L;
 
-
+    private static final Object LOCK = new Object();
     private static volatile Blockchain instance;
     private static final List<Account> registeredAccounts = new ArrayList<>();
     private static Deque<Block> blocksList = new ArrayDeque<>();
@@ -43,9 +43,14 @@ public class Blockchain implements Serializable {
 
     public static Blockchain getInstance() {
         if (instance == null) {
-            instance = new Blockchain();
+            return instance;
         }
-        return instance;
+        synchronized (LOCK) {
+            if (instance == null) {
+                instance = new Blockchain();
+            }
+            return instance;
+        }
     }
 
     public synchronized long getBalanceByAccountUUID(UUID uuid) {

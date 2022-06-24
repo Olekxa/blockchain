@@ -11,6 +11,7 @@ import java.security.SignatureException;
 import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 public class Account implements Runnable {
 
@@ -20,7 +21,7 @@ public class Account implements Runnable {
     private final PrivateKey privateKey;
     private final PublicKey publicKey;
 
-    public Account(String name, boolean isSending) throws NoSuchAlgorithmException{
+    public Account(String name, boolean isSending) throws NoSuchAlgorithmException {
         this.name = name;
         KeyGenerator keyGenerator = new KeyGenerator(1024);
         this.privateKey = keyGenerator.getPrivateKey();
@@ -43,16 +44,17 @@ public class Account implements Runnable {
                     e.printStackTrace();
                 }
                 Optional<TransactionBasis> transactionBasis = TransactionOperation.generateRandomTransactionBasis(this);
-                if (transactionBasis.isPresent())
+                transactionBasis.ifPresent(basis -> {
                     try {
-                        Transaction transaction = createSignedTransaction(transactionBasis.get());
-                        Blockchain.getInstance().receiveFromAccount(this, transaction);
+                        Transaction transaction = createSignedTransaction(basis);
+                        Blockchain.getInstance().receiveFromAccount(Account.this, transaction);
                     } catch (NoSuchAlgorithmException | SignatureException | InvalidKeyException e) {
                         e.printStackTrace();
                     }
-                }
+                });
             }
         }
+    }
 
 
     private Transaction createSignedTransaction(TransactionBasis transactionBasis) throws NoSuchAlgorithmException, SignatureException, InvalidKeyException {

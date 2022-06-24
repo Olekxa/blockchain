@@ -11,7 +11,7 @@ import java.util.List;
 
 public class Runner {
     public static void main(String[] args) throws InterruptedException, NoSuchAlgorithmException {
-
+       // if ()
         try {
             Blockchain importedBlockChain = (Blockchain) SerializationUtil.deserialize("blockchain.txt");
             Blockchain.getInstance().setBlocksList(importedBlockChain.getBlocksList());
