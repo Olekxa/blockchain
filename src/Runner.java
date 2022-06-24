@@ -14,7 +14,7 @@ public class Runner {
     public static void main(String[] args) throws InterruptedException, NoSuchAlgorithmException {
         String path = "blockchain.txt";
         File file = new File(path);
-        if (file.exists()) {
+        if (file.exists() && !file.isDirectory()) {
             try {
                 Blockchain importedBlockChain = (Blockchain) SerializationUtil.deserialize(path);
                 Blockchain.getInstance().setBlocksList(importedBlockChain.getBlocksList());
