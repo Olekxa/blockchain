@@ -19,7 +19,7 @@ public class Block implements Serializable {
     private String zeroUpdateMessage;
 
     public Block(Block previous) {
-        this.id = IdCounter.generateBlockId();
+        this.id = previous != null ? previous.getId() : 0;
         this.timestamp = new Date().getTime();
         this.hashOfPrevious = previous == null ? "0" : previous.getHash();
         this.minerId = 0;
@@ -44,10 +44,10 @@ public class Block implements Serializable {
                         Hash of the previous block:
                         %s%nHash of the block:
                         %s%n""",
-                this.getMinerId(), this.getMinerPaymentTransaction().buildMessage(), this.getId(), this.getTimestamp(), this.getMagicNum(), this.getHashOfPrevious(), this.getHash()) );
-        ret.append( "Block data: " );
+                this.getMinerId(), this.getMinerPaymentTransaction().buildMessage(), this.getId(), this.getTimestamp(), this.getMagicNum(), this.getHashOfPrevious(), this.getHash()));
+        ret.append("Block data: ");
         if (this.data.isEmpty()) {
-            ret.append( "\nNo transactions" );
+            ret.append("\nNo transactions");
         } else {
             for (Transaction data : this.getData()) {
                 ret.append("\n");
@@ -55,7 +55,7 @@ public class Block implements Serializable {
             }
         }
         ret.append("\n");
-        ret.append( String.format("Block was generating for %s seconds\n" + "%s%n", this.getTimeToGenerate(), this.getZeroUpdateMessage()) );
+        ret.append(String.format("Block was generating for %s seconds\n" + "%s%n", this.getTimeToGenerate(), this.getZeroUpdateMessage()));
         return ret.toString();
     }
 
