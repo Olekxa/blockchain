@@ -19,7 +19,7 @@ public class Block implements Serializable {
     private String zeroUpdateMessage;
 
     public Block(Block previous) {
-        this.id = previous != null ? previous.getId() : 0;
+        this.id = previous != null ? previous.getId() + 1 : 1;
         this.timestamp = new Date().getTime();
         this.hashOfPrevious = previous == null ? "0" : previous.getHash();
         this.minerId = 0;

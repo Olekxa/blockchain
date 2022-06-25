@@ -11,8 +11,8 @@ public class Miner implements Runnable {
     private final int id;
     private final Account account;
 
-    public Miner() throws NoSuchAlgorithmException {
-        this.id = IdCounter.generateThreadId();
+    public Miner(int id) throws NoSuchAlgorithmException {
+        this.id = id;
         this.account = new Account("miner" + this.id, true);
         Blockchain.getInstance().registerAccount(this.account);
     }

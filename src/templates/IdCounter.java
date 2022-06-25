@@ -1,21 +1,14 @@
 package templates;
 
+import java.util.concurrent.atomic.AtomicLong;
+
 public class IdCounter {
-    private static long blockCounter = 0;
-    private static int threadCounter = 0;
-    private static long transactionCounter = 0;
+    private static AtomicLong transactionCounter = new AtomicLong(0);
 
-    private IdCounter() {}
-
-    public static long generateBlockId() {
-        return (++blockCounter);
-    }
-
-    public static int generateThreadId() {
-        return (++threadCounter);
+    private IdCounter() {
     }
 
     public synchronized static long generateTransactionCounter() {
-        return (++transactionCounter);
+        return (transactionCounter.incrementAndGet());
     }
 }

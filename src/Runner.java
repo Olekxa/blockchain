@@ -7,6 +7,8 @@ import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -46,11 +48,12 @@ public class Runner {
             Blockchain.getInstance().registerAccount(account);
         }
 
-        //List<Account> listOfAccounts = Blockchain.getInstance().getRegisteredAccounts();
-        Thread miner1 = new Thread(new Miner());
-        Thread miner2 = new Thread(new Miner());
-        Thread miner3 = new Thread(new Miner());
-        Thread miner4 = new Thread(new Miner());
+        Collection<Thread> mine = new ArrayList<>();
+        for (int i = 1; i <= 4; i++) {
+            Thread miner = new Thread(new Miner(i));
+            miner.start();
+            mine.add(miner);
+        }
 
         List<Account> listOfAccounts = Blockchain.getInstance().getRegisteredAccounts();
 
@@ -60,20 +63,18 @@ public class Runner {
             listOfAccountThreads.add(temp);
             temp.start();
         }
-
-        miner1.start();
-        miner2.start();
-        miner3.start();
-        miner4.start();
+        for (int i = 1; i <= 4; i++) {
+            Thread miner = new Thread(new Miner(i));
+            miner.start();
+        }
 
         for (Thread accountThread : listOfAccountThreads) {
             accountThread.join();
         }
 
-        miner1.join();
-        miner2.join();
-        miner3.join();
-        miner4.join();
+        for (Thread thread : mine) {
+            thread.join();
+        }
 
     }
 }
