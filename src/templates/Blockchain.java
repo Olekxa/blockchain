@@ -28,7 +28,7 @@ public class Blockchain implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 7L;
-    
+
     private static volatile Blockchain instance;
     private static final List<Account> registeredAccounts = new ArrayList<>();
     private static Deque<Block> blocksList = new ArrayDeque<>();
@@ -99,7 +99,9 @@ public class Blockchain implements Serializable {
 
     public synchronized void receiveFromMiner(Miner miner, String hash, long magicNum, long timeToGenerate) {
         if (hash.substring(0, numOfStartingZeros).matches("0*")) {
-            putTheBlock(miner, hash, magicNum, timeToGenerate);
+            if (Blockchain.instance.underCreation()) {
+                putTheBlock(miner, hash, magicNum, timeToGenerate);
+            }
         }
     }
 
