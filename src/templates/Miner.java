@@ -26,7 +26,7 @@ public class Miner implements Runnable {
         }
     }
 
-    private Proof generateProof() {
+    private synchronized Proof generateProof() {
         Proof proof = new Proof();
         String compatibleHash;
         Random rand = new Random();

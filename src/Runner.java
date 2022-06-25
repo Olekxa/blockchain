@@ -55,14 +55,15 @@ public class Runner {
             mine.add(miner);
         }
 
-        List<Account> listOfAccounts = Blockchain.getInstance().getRegisteredAccounts();
+        Collection<Account> listOfAccounts = Blockchain.getInstance().getRegisteredAccounts();
 
-        List<Thread> listOfAccountThreads = new ArrayList<>();
+        Collection<Thread> listOfAccountThreads = new ArrayList<>();
         for (Account account : listOfAccounts) {
             Thread temp = new Thread(account);
             listOfAccountThreads.add(temp);
             temp.start();
         }
+
         for (int i = 1; i <= 4; i++) {
             Thread miner = new Thread(new Miner(i));
             miner.start();
