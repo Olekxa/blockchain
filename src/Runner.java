@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-
 public class Runner {
     public static void main(String[] args) throws InterruptedException, NoSuchAlgorithmException {
         int numberOfThreads;
@@ -47,21 +46,11 @@ public class Runner {
             Blockchain.getInstance().registerAccount(account);
         }
 
-        Collection<Thread> mine = new ArrayList<>();
-        for (int i = 1; i <= numberOfThreads; i++) {
-            Thread miner = new Thread(new Miner(i));
-            miner.start();
-            mine.add(miner);
-        }
+        Collection<Thread> mine = generateMinersThreads(numberOfThreads);
 
         Collection<Account> listOfAccounts = Blockchain.getInstance().getRegisteredAccounts();
 
-        Collection<Thread> listOfAccountThreads = new ArrayList<>();
-        for (Account account : listOfAccounts) {
-            Thread temp = new Thread(account);
-            listOfAccountThreads.add(temp);
-            temp.start();
-        }
+        Collection<Thread> listOfAccountThreads = generateAccountThreads(listOfAccounts);
 
         for (int i = 1; i <= numberOfThreads; i++) {
             Thread miner = new Thread(new Miner(i));
@@ -75,6 +64,26 @@ public class Runner {
         for (Thread thread : mine) {
             thread.join();
         }
+    }
+
+    private static Collection<Thread> generateMinersThreads(int numberOfThreads) throws NoSuchAlgorithmException {
+        Collection<Thread> mine = new ArrayList<>();
+        for (int i = 1; i <= numberOfThreads; i++) {
+            Thread miner = new Thread(new Miner(i));
+            miner.start();
+            mine.add(miner);
+        }
+        return mine;
+    }
+
+    private static Collection<Thread> generateAccountThreads(Collection<Account> listOfAccounts) {
+        Collection<Thread> listOfAccountThreads = new ArrayList<>();
+        for (Account account : listOfAccounts) {
+            Thread temp = new Thread(account);
+            listOfAccountThreads.add(temp);
+            temp.start();
+        }
+        return listOfAccountThreads;
     }
 }
 
