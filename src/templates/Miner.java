@@ -7,7 +7,6 @@ import java.util.Date;
 import java.util.Random;
 
 public class Miner implements Runnable {
-
     private final int id;
     private final Account account;
 

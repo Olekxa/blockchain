@@ -1,5 +1,6 @@
 import templates.Account;
 import templates.Blockchain;
+import templates.Config;
 import templates.Miner;
 import utils.SerializationUtil;
 
@@ -8,48 +9,46 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 
 public class Runner {
     public static void main(String[] args) throws InterruptedException, NoSuchAlgorithmException {
-        String path = "blockchain.txt";
-        File file = new File(path);
+        int numberOfThreads;
+
+        if (args != null && args.length > 0) {
+            try {
+                numberOfThreads = Integer.parseInt(args[0]);
+            } catch (NumberFormatException e) {
+                System.out.println("Number of threads must be in numeric format");
+                return;
+            }
+        } else {
+            numberOfThreads = Config.MIN_THREADS;
+        }
+
+        File file = new File(Config.FILE_PATH);
         if (file.exists() && !file.isDirectory()) {
             try {
-                Blockchain importedBlockChain = (Blockchain) SerializationUtil.deserialize(path);
+                Blockchain importedBlockChain = (Blockchain) SerializationUtil.deserialize(file.getName());
                 Blockchain.getInstance().setBlocksList(importedBlockChain.getBlocksList());
             } catch (IOException e) {
-                e.printStackTrace();
+                System.out.println("File was not found: " + file.getName());
+                return;
             } catch (Exception e) {
-                e.printStackTrace();
+                System.out.println("Something went wrong: " + e.getLocalizedMessage());
                 return;
             }
         }
 
+        List<Account> accounts = Account.generateMockedUsers();
 
-        List<Account> accounts = List.of(
-                new Account("Tom Catalin", true),
-                new Account("Jakar Taleb", true),
-                new Account("Tom Catalin", true),
-                new Account("Jakar Taleb", true),
-                new Account("Hybe Ernath", true),
-                new Account("Worker1", false),
-                new Account("Worker2", false),
-                new Account("Worker3", false),
-                new Account("Director1", false),
-                new Account("CarPartsShop", false),
-                new Account("ShoesShop", false),
-                new Account("CarShop", true),
-                new Account("FastFood", false)
-        );
         for (Account account : accounts) {
             Blockchain.getInstance().registerAccount(account);
         }
 
         Collection<Thread> mine = new ArrayList<>();
-        for (int i = 1; i <= 4; i++) {
+        for (int i = 1; i <= numberOfThreads; i++) {
             Thread miner = new Thread(new Miner(i));
             miner.start();
             mine.add(miner);
@@ -64,7 +63,7 @@ public class Runner {
             temp.start();
         }
 
-        for (int i = 1; i <= 4; i++) {
+        for (int i = 1; i <= numberOfThreads; i++) {
             Thread miner = new Thread(new Miner(i));
             miner.start();
         }
@@ -76,7 +75,6 @@ public class Runner {
         for (Thread thread : mine) {
             thread.join();
         }
-
     }
 }
 

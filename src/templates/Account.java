@@ -8,19 +8,21 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.Signature;
 import java.security.SignatureException;
+import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 
 public class Account implements Runnable {
 
-    private final UUID uuid = UUID.randomUUID();
+    private final UUID uuid;
     private final String name;
     private final boolean isSending;
     private final PrivateKey privateKey;
     private final PublicKey publicKey;
 
     public Account(String name, boolean isSending) throws NoSuchAlgorithmException {
+        this.uuid = UUID.randomUUID();
         this.name = name;
         KeyGenerator keyGenerator = new KeyGenerator(1024);
         this.privateKey = keyGenerator.getPrivateKey();
@@ -81,4 +83,21 @@ public class Account implements Runnable {
         return uuid;
     }
 
+    public static List<Account> generateMockedUsers() throws NoSuchAlgorithmException {
+        return List.of(
+                new Account("Tom Catalin", true),
+                new Account("Jakar Taleb", true),
+                new Account("Tom Catalin", true),
+                new Account("Jakar Taleb", true),
+                new Account("Hybe Ernath", true),
+                new Account("Worker1", false),
+                new Account("Worker2", false),
+                new Account("Worker3", false),
+                new Account("Director1", false),
+                new Account("CarPartsShop", false),
+                new Account("ShoesShop", false),
+                new Account("CarShop", true),
+                new Account("FastFood", false)
+        );
+    }
 }
