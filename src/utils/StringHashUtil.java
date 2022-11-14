@@ -1,11 +1,13 @@
 package utils;
 
+import templates.HashError;
+
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 
 public class StringHashUtil {
 
-    public static String applySha256(String input) {
+    public static String applySha256(String input) throws HashError {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             /* Applies sha256 to our input */
@@ -18,7 +20,7 @@ public class StringHashUtil {
             }
             return hexString.toString();
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new HashError("Error with hashing");
         }
     }
 }

@@ -52,7 +52,7 @@ public class Miner implements Runnable {
         return id;
     }
 
-    protected static class  Proof {
+    protected static class Proof {
         private String hash;
         private long magicNum;
         private long timeToGenerate;
