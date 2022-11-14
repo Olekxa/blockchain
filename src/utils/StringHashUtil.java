@@ -1,24 +1,26 @@
 package utils;
 
+import templates.HashError;
+
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 
 public class StringHashUtil {
-    public static String applySha256(String input){
+
+    public static String applySha256(String input) throws HashError {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             /* Applies sha256 to our input */
             byte[] hash = digest.digest(input.getBytes(StandardCharsets.UTF_8));
             StringBuilder hexString = new StringBuilder();
-            for (byte elem: hash) {
+            for (byte elem : hash) {
                 String hex = Integer.toHexString(0xff & elem);
-                if(hex.length() == 1) hexString.append('0');
+                if (hex.length() == 1) hexString.append('0');
                 hexString.append(hex);
             }
             return hexString.toString();
-        }
-        catch(Exception e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new HashError("Error with hashing");
         }
     }
 }
